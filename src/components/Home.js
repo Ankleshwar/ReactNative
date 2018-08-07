@@ -1,6 +1,5 @@
 import React from 'react';
-import {View,Text,StyleSheet} from 'react-native';
-import Game from './Game'
+import Game from './Game';
 
 
 class  Home extends React.Component {
@@ -9,7 +8,7 @@ class  Home extends React.Component {
     return(
 
 
-      <Game randomNumberCount={8} />
+      <Game randomNumberCount={6} initialSeconds={10} />
 
 
     );
@@ -18,14 +17,14 @@ class  Home extends React.Component {
 
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex : 1,
-    backgroundColor:'#ddd',
-  }
-
-
-});
+// const styles = StyleSheet.create({
+//   container: {
+//     flex : 1,
+//     backgroundColor:'#ddd',
+//   }
+//
+//
+// });
 
 
 export default Home;

@@ -22,7 +22,7 @@ module.exports = {
     'linebreak-style': ['error', 'unix'],
     quotes: ['error', 'single'],
     semi: ['error', 'always'],
-    'no-console': ['warn', { allow: ['info', 'error'] }],
-    'arrow-parens': ['error', 'always'],
+  'no-console': 'off',
+  'arrow-parens': ['error', 'always'],
   },
 };

@@ -8,35 +8,113 @@ import {View,Text,StyleSheet} from 'react-native';
 class  Game extends React.Component {
 
 static propTypes = {
-    randomNumberCount: PropTypes.number.isRequired,
+  randomNumberCount: PropTypes.number.isRequired,
+  initialSeconds : PropTypes.number.isRequired,
+};
+
+state = {
+  selectedIds: [],
+  remainingSeconds: this.props.initialSeconds,
 };
 
 
+isNumberSelected = (numberIndex) => {
+  // console.log(this.state.selectedIds);
+  // console.log(numberIndex);
+  return this.state.selectedIds.indexOf(numberIndex) >= 0;
+};
+
+selectNumber = (numberIndex) => {
+  this.setState((prevState) => ({
+    selectedIds : [...prevState.selectedIds,numberIndex],
+  }));
+};
+
+componentDidMount(){
+  this.intervalId  =  setInterval(() =>{
+    this.setState((prevState)  =>{
+      return{remainingSeconds: prevState.remainingSeconds -1};
+    }, () => {
+      if (this.state.remainingSeconds == 0){
+        clearInterval(this.intervalId);
+      }
+    });
+  },1000);
+}
+
+
+componentWillUnMount(){
+  clearInterval(this.intervalId);
+}
+
+gameStatus = () => {
+  const sumSelected = this.state.selectedIds.reduce((acc,curr) => {
+    return acc + this.randomNumbers[curr];
+  },0);
+  console.log(sumSelected);
+  if (this.state.remainingSeconds == 0){
+    return 'LOSS';
+  }
+
+  if(sumSelected < this.target){
+    return 'PLAYING';
+  }
+  if(sumSelected === this.target){
+    return 'WON';
+  }
+  if(sumSelected > this.target){
+    return 'LOSS';
+  }
+}
+
+targetPanelStyle = (status) => {
+  console.log('Hi') ;
+  if (status === 'WON'){
+    console.log('WON') ;
+    return styles.STATUS_WON ;
+  }
+  if (status === 'LOSS'){
+    console.log('LOSS') ;
+    return styles.STATUS_LOSS ;
+  }
+  if (status === 'PLAYING'){
+    console.log('PLAYING') ;
+    return styles.STATUS_PLAYING ;
+  }
+};
+
 randomNumbers = Array.from({length:this.props.randomNumberCount})
-                    .map(()=>1 + Math.floor(10 * Math.random()))
+  .map(()=>1 + Math.floor(10 * Math.random()))
 
 //  target =  10 + Math.floor(40 * Math.random());
 target =  this.randomNumbers.slice(0, this.props.randomNumberCount - 3)
-                            .reduce((acc,curr)=> acc+curr,0)
+  .reduce((acc,curr)=> acc+curr,0)
 
-  render(){
-    return(
+render(){
+  const gameStatusCurr    =  this.gameStatus();
+  return(
     <View style={styles.container}>
-    <Text style={styles.target}>{this.target}</Text>
-    <View style={styles.randomContainer}>
-    {this.randomNumbers.map((randomNumber,index) =>
-      <Text style={styles.random} key={index}>{randomNumber}</Text>
+      <Text style={[styles.target,this.targetPanelStyle(gameStatusCurr)]}>{this.target}</Text>
+      <View style={styles.randomContainer}>
+        {this.randomNumbers.map((randomNumber,index) =>
+          <RandomNumber
+            key={index}
+            id={index}
+            number={randomNumber}
+            isDisable={this.isNumberSelected(index) || gameStatusCurr !== 'PLAYING'}
+            onPress={this.selectNumber}
+          />
 
 
-    )}
-
-    </View>
+        )}
 
       </View>
+      <Text>{this.state.remainingSeconds}</Text>
+    </View>
 
 
-    );
-  }
+  );
+}
 
 
 }
@@ -70,6 +148,15 @@ const styles = StyleSheet.create({
     textAlign:'center',
   },
 
+  STATUS_WON: {
+    backgroundColor : 'green',
+  },
+  STATUS_LOSS: {
+    backgroundColor : 'red',
+  },
+  STATUS_PLAYING: {
+    backgroundColor : '#bbb',
+  },
 
 });
 
